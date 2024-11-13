@@ -1,0 +1,57 @@
+{
+  "title": "Human Metapneumovirus",
+  "maintainers": [
+    {"name": "Isabel Joia"}
+  ],
+  "data_provenance": [
+    {
+      "name": "GenBank",
+      "url": "https://www.ncbi.nlm.nih.gov/genbank/"
+    }
+  ],
+  "colorings": [
+    {
+      "key": "gt",
+      "title": "genotype",
+      "type": "categorical"
+    },
+    {
+      "key": "num_date",
+      "title": "date",
+      "type": "continuous"
+    },
+    {
+      "key": "author",
+      "title": "author",
+      "type": "categorical"
+    },
+    {
+      "key": "country",
+      "title": "country",
+      "type": "categorical"
+    },
+    {
+      "key": "region",
+      "title": "region",
+      "type": "categorical"
+    },
+    {
+      "key": "insertion6738",
+      "title": ">30bp insertion in G gene",
+      "type": "boolean"
+    }
+  ],
+  "geo_resolutions": [
+    "country",
+    "region"
+  ],
+  "display_defaults": {
+    "map_triplicate": true,
+    "transmission_lines": false
+  },
+  "filters": [
+    "country",
+    "region",
+    "author"
+  ]
+}

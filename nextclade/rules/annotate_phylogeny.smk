@@ -1,24 +1,59 @@
-"""
-This part of the workflow creates additonal annotations for the reference tree
-of the Nextclade dataset.
+rule ancestral:
+    input:
+        tree=rules.refine.output.tree,
+        alignment=rules.exclude.output.filteredsequences, #alignment= rules.align.output.alignment
+        annotation=GENBANK_PATH,
+        reference='resources/reference.fasta',
+    output:
+        node_data="output/muts.json",
+    params:
+        inference = config["ancestral"]["inference"],
+        translation_template=r"output/translations/cds_%GENE.translation.fasta",
+        output_translation_template=r"output/translations/cds_%GENE.ancestral.fasta",
+        genes=" ".join(GENES),
+    shell:
+        """
+        augur ancestral \
+            --tree {input.tree} \
+            --alignment {input.alignment} \
+            --inference {params.inference} \
+            --annotation {input.annotation} \
+            --root-sequence {input.reference} \
+            --genes {params.genes} \
+            --translations {params.translation_template} \
+            --output-node-data {output.node_data} \
+            --output-translations {params.output_translation_template}
+        """
 
-REQUIRED INPUTS:
+rule translate:
+    """Translating amino acid sequences"""
+    input:
+        tree = "output/tree.nwk",
+        node_data = rules.ancestral.output.node_data,
+        reference = "resources/reference.gb",
+    output:
+        node_data = "output/aa_muts.json"
+    shell:
+        """
+        augur translate \
+            --tree {input.tree} \
+            --ancestral-sequences {input.node_data} \
+            --reference-sequence {input.reference} \
+            --output {output.node_data} \
+        """
 
-    metadata            = data/metadata.tsv
-    prepared_sequences  = results/prepared_sequences.fasta
-    tree                = results/tree.nwk
-
-OUTPUTS:
-
-    nt_muts     = results/nt_muts.json
-    aa_muts     = results/aa_muts.json
-    clades      = results/clades.json
-
-This part of the workflow usually includes the following steps:
-
-    - augur ancestral
-    - augur translate
-    - augur clades
-
-See Augur's usage docs for these commands for more details.
-"""
+rule clades:
+    input:
+        tree = "output/tree.nwk",
+        aa_muts = "output/aa_muts.json",
+        nuc_muts = rules.ancestral.output.node_data,
+        clades = "resources/clades.tsv",
+    output:
+        clade_data = "output/clades.json"
+    shell:
+        """
+        augur clades --tree {input.tree} \
+            --mutations {input.nuc_muts} {input.aa_muts} \
+            --clades {input.clades} \
+            --output-node-data {output.clade_data}
+        """

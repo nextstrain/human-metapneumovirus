@@ -42,7 +42,7 @@ rule refine:
     input:
         tree = "results/tree_raw.nwk",
         alignment = "results/aligned.fasta",
-        metadata = "data/metadata.tsv"
+        metadata = "data/metadata.tsv"  
     output:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"

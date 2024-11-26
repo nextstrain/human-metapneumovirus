@@ -77,6 +77,7 @@ rule align:
             --input-ref {input.reference} \
             --input-pathogen-json {input.pathogen_json} \
             --input-annotation {input.annotations} \
+            --include-reference \
             --output-translations {params.translation_template} \
             --output-tsv {output.tsv} \
             --output-fasta {output.alignment}

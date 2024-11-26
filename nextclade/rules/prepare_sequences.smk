@@ -1,7 +1,7 @@
 REFERENCE_ACCESSION = "NC_039199.1"
 TAXON_ID = 162145
 GENES = ["N", "P", "M", "F", "M2-1", "M2-2", "SH", "G", "L"]
-ALLOWED_DIVERGENCE = "2000"
+ALLOWED_DIVERGENCE = "4000"
 GFF_PATH = "resources/genome_annotation.ggf3"
 GENBANK_PATH = "resources/reference.gb"
 REFERENCE_PATH = "resources/reference.fasta"
@@ -63,6 +63,7 @@ rule align:
     input:
         sequences = rules.filter.output.sequences,
         reference = "resources/reference.fasta",
+        pathogen_json = "resources/pathogen.json",
         annotations = GFF_PATH,
     output:
         alignment = "output/aligned.fasta",
@@ -74,6 +75,7 @@ rule align:
         nextclade3 run \
             {input.sequences} \
             --input-ref {input.reference} \
+            --input-pathogen-json {input.pathogen_json} \
             --input-annotation {input.annotations} \
             --output-translations {params.translation_template} \
             --output-tsv {output.tsv} \

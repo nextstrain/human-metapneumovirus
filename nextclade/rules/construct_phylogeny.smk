@@ -35,7 +35,6 @@ rule refine:
             --alignment {input.alignment} \
             --keep-root \
             --keep-polytomies \
-            --divergence-units mutations \
             --output-node-data {output.node_data} \
             --output-tree {output.tree}
         """

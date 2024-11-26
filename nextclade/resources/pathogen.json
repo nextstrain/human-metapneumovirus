@@ -30,8 +30,8 @@
   "qc": {
     "privateMutations": {
       "enabled": true,
-      "typical": 50,
-      "cutoff": 150,
+      "typical": 150,
+      "cutoff": 200,
       "weightLabeledSubstitutions": 2,
       "weightReversionSubstitutions": 1,
       "weightUnlabeledSubstitutions": 1

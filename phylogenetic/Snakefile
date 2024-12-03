@@ -2,34 +2,21 @@
 This is the main phylogenetic Snakefile that orchestrates the full phylogenetic
 workflow and defines its default output(s).
 """
-# The workflow filepaths are written relative to this Snakefile's base directory
+
 workdir: workflow.current_basedir
+
+#wildcard_constraints: subtype = r"A|B"
 
 # Use default configuration values. Override with Snakemake's --configfile/--config options.
 configfile: "defaults/config.yaml"
 
-
-# This is the default rule that Snakemake will run when there are no specified targets.
-# The default output of the phylogenetic workflow is usually the final
-# Nexstrain dataset(s) or Auspice JSON(s) that are output from `rules/export.smk`
-# See Nextstrain docs on expected naming conventions of dataset files
-# https://docs.nextstrain.org/page/reference/data-formats.html
 rule all:
     input:
         # Fill in path(s) to the final exported Auspice JSON(s)
-        auspice_json = "auspice/mpv.json",
+        auspice_json = expand("auspice/hmpv_{subtype}.json",
+            subtype = config.get("subtypes")),
 
-
-# These rules are imported in the order that they are expected to run.
-# Each Snakefile will have documented inputs and outputs that should be kept as
-# consistent interfaces across pathogen repos. This allows us to define typical
-# steps that are required for a phylogenetic workflow, but still allow pathogen
-# specific customizations within each step.
-# Note that only PATHOGEN level customizations should be added to these
-# core steps, meaning they are custom rules necessary for all builds of the pathogen.
-# If there are build specific customizations, they should be added with the
-# custom_rules imported below to ensure that the core workflow is not complicated
-# by build specific rules.
+include: "rules/sort.smk"
 include: "rules/prepare_sequences.smk"
 include: "rules/construct_phylogeny.smk"
 include: "rules/annotate_phylogeny.smk"

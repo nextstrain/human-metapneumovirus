@@ -31,22 +31,26 @@ rule filter:
     """
     input:
         sequences = "data/sequences.fasta",
-        metadata = "data/metadata.tsv",
+        metadata = rules.extend_metadata.output.metadata,
     output:
-        sequences = "results/filtered.fasta"
+        sequences = "results/filtered_{subtype}.fasta",
+        metadata = "results/metadata_{subtype}.tsv",
     params:
         group_by = config["filter"]["group_by"],
         sequences_per_group = config["filter"]["sequences_per_group"],
         min_date = config["filter"]["min_date"],
         min_length = config["filter"]["min_length"],
         strain_id = config.get("strain_id_field", "strain"),
+        subtype = lambda wc: wc.subtype
     shell:
         """
         augur filter \
             --sequences {input.sequences} \
             --metadata {input.metadata} \
             --metadata-id-columns {params.strain_id} \
-            --output {output.sequences} \
+            --query "subtypes == '{params.subtype}'" \
+            --output-sequences {output.sequences} \
+            --output-metadata {output.metadata} \
             --group-by {params.group_by} \
             --sequences-per-group {params.sequences_per_group} \
             --min-date {params.min_date} \
@@ -58,11 +62,11 @@ rule align:
     Aligning sequences to {input.reference}
     """
     input:
-        sequences = "results/filtered.fasta",
-        reference = "defaults/reference.gb",
+        sequences = rules.filter.output.sequences,
+        reference = "defaults/reference_{subtype}.gb",
     output:
-        alignment = "results/aligned.fasta",
-        insertions = "results/aligned.fasta.insertions.csv",
+        alignment = "results/aligned_{subtype}.fasta",
+        insertions = "results/aligned_{subtype}.fasta.insertions.csv",
     shell:
         """
         augur align \
@@ -77,14 +81,17 @@ rule align:
 
 rule add_insertion:
     input:
-        metadata = "data/metadata.tsv",
+        metadata = rules.filter.output.metadata,
         insertions = rules.align.output.insertions
     output: 
-        totalmetadata = 'results/totalmetadata.tsv'
+        totalmetadata = 'results/totalmetadata_{subtype}.tsv'
+    params:
+        subtype = lambda wc: wc.subtype
     shell:
         """
         python scripts/insertion-metadata.py \
             --alignedinsertions {input.insertions} \
             --metadata {input.metadata}\
+            --subtype {params.subtype} \
             --metadata_insertion {output.totalmetadata}
         """

@@ -7,6 +7,8 @@
 strain_id_field: "accession"
 display_strain_field: "strain"
 
+subtypes: ['A', 'B']
+
 filter:
   group_by: "country year month"
   sequences_per_group: 40

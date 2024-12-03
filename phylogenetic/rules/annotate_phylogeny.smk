@@ -33,10 +33,10 @@ to the ones produced by Augur commands.
 rule ancestral:
     """Reconstructing ancestral sequences and mutations"""
     input:
-        tree = "results/tree.nwk",
-        alignment = "results/aligned.fasta"
+        tree = rules.refine.output.tree,
+        alignment = rules.align.output.alignment,
     output:
-        node_data = "results/nt_muts.json"
+        node_data = "results/nt_muts_{subtype}.json"
     params:
         inference = config["ancestral"]["inference"]
     shell:
@@ -51,11 +51,11 @@ rule ancestral:
 rule translate:
     """Translating amino acid sequences"""
     input:
-        tree = "results/tree.nwk",
+        tree = rules.refine.output.tree,
         node_data = rules.ancestral.output.node_data,
-        reference = "defaults/reference.gb",
+        reference = "defaults/reference_{subtype}.gb",
     output:
-        node_data = "results/aa_muts.json"
+        node_data = "results/aa_muts_{subtype}.json"
     shell:
         """
         augur translate \
@@ -67,12 +67,12 @@ rule translate:
 
 rule clades:
     input:
-        tree = "results/tree.nwk",
-        aa_muts = "results/aa_muts.json",
+        tree = rules.refine.output.tree,
+        aa_muts = rules.translate.output.node_data,
         nuc_muts = rules.ancestral.output.node_data,
-        clades = "defaults/clades.tsv",
+        clades = "defaults/clades_{subtype}.tsv",
     output:
-        clade_data = "results/clades.json"
+        clade_data = "results/clades_{subtype}.json"
     shell:
         """
         augur clades --tree {input.tree} \
@@ -87,10 +87,10 @@ rule traits:
       - increase uncertainty of reconstruction by {params.sampling_bias_correction} to partially account for sampling bias
     """
     input:
-        tree = "results/tree.nwk",
-        metadata = "results/totalmetadata.tsv"
+        tree = rules.refine.output.tree,
+        metadata = rules.add_insertion.output.totalmetadata,
     output:
-        node_data = "results/traits.json",
+        node_data = "results/traits_{subtype}.json",
     params:
         columns = config["traits"]["columns"],
         sampling_bias_correction = config["traits"]["sampling_bias_correction"],

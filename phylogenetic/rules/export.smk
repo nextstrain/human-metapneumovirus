@@ -27,17 +27,17 @@ See Augur's usage docs for these commands for more details.
 rule export:
     """Exporting data files for for auspice"""
     input:
-        tree = "results/tree.nwk",
-        metadata = "data/metadata.tsv",
-        branch_lengths = "results/branch_lengths.json",
-        traits = "results/traits.json",
-        nt_muts = "results/nt_muts.json",
-        aa_muts = "results/aa_muts.json",
+        tree = rules.refine.output.tree,
+        metadata = rules.filter.output.metadata,
+        branch_lengths = rules.refine.output.node_data,
+        traits = rules.traits.output.node_data,
+        nt_muts = rules.ancestral.output.node_data,
+        aa_muts = rules.translate.output.node_data,
         colors = "defaults/colors.tsv",
         clades = rules.clades.output.clade_data,
         auspice_config = "defaults/auspice_config.json",
     output:
-        auspice_json = "results/raw_mpv.json"
+        auspice_json = "results/raw_mpv_{subtype}.json"
     params:
         strain_id = config.get("strain_id_field", "strain"),
     shell:
@@ -55,10 +55,10 @@ rule export:
 
 rule final_strain_name:
     input:
-        auspice_json="results/raw_mpv.json",
-        metadata="data/metadata.tsv"
+        auspice_json=rules.export.output.auspice_json,
+        metadata=rules.filter.output.metadata,
     output:
-        auspice_json="auspice/mpv.json"
+        auspice_json="auspice/hmpv_{subtype}.json"
     params:
         strain_id=config["strain_id_field"],
         display_strain_field=config.get("display_strain_field", "strain"),

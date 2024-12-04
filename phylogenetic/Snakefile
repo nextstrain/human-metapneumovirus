@@ -13,13 +13,18 @@ configfile: "defaults/config.yaml"
 rule all:
     input:
         # Fill in path(s) to the final exported Auspice JSON(s)
-        auspice_json = expand("auspice/hmpv_{subtype}.json",
-            subtype = config.get("subtypes")),
+        auspice_json = expand("auspice/hmpv_{subtype}_{build}.json",
+            subtype = config.get("subtypes"),
+            build = config.get("build", ['genome'])),
 
 include: "rules/sort.smk"
+
 include: "rules/prepare_sequences.smk"
+
 include: "rules/construct_phylogeny.smk"
+
 include: "rules/annotate_phylogeny.smk"
+
 include: "rules/export.smk"
 
 # Allow users to import custom rules provided via the config.

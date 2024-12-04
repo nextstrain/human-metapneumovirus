@@ -1,7 +1,8 @@
 {
   "title": "Human Metapneumovirus",
   "maintainers": [
-    {"name": "Isabel Joia"}
+    {"name": "Richard Neher","url": "http://nextstrain.org"},
+    {"name": "Isabel Joia", "url": "http://nextstrain.org"}
   ],
   "data_provenance": [
     {
@@ -12,27 +13,22 @@
   "colorings": [
     {
       "key": "gt",
-      "title": "genotype",
+      "title": "Genotype",
       "type": "categorical"
     },
     {
       "key": "num_date",
-      "title": "date",
+      "title": "Date",
       "type": "continuous"
     },
     {
-      "key": "author",
-      "title": "author",
-      "type": "categorical"
-    },
-    {
       "key": "country",
-      "title": "country",
+      "title": "Country",
       "type": "categorical"
     },
     {
       "key": "region",
-      "title": "region",
+      "title": "Region",
       "type": "categorical"
     },
     {
@@ -47,11 +43,12 @@
   ],
   "display_defaults": {
     "map_triplicate": true,
+    "color_by" : "clade_membership",
     "transmission_lines": false
   },
   "filters": [
     "country",
     "region",
-    "author"
+    "clade_membership"
   ]
 }

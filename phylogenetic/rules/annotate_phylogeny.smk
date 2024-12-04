@@ -36,7 +36,7 @@ rule ancestral:
         tree = rules.refine.output.tree,
         alignment = rules.align.output.alignment,
     output:
-        node_data = "results/nt_muts_{subtype}.json"
+        node_data = "results/{subtype}/{build}/nt_muts.json"
     params:
         inference = config["ancestral"]["inference"]
     shell:
@@ -53,9 +53,9 @@ rule translate:
     input:
         tree = rules.refine.output.tree,
         node_data = rules.ancestral.output.node_data,
-        reference = "defaults/reference_{subtype}.gb",
+        reference = rules.newreference.output.newreferencegb,
     output:
-        node_data = "results/aa_muts_{subtype}.json"
+        node_data = "results/{subtype}/{build}/aa_muts.json"
     shell:
         """
         augur translate \
@@ -65,21 +65,21 @@ rule translate:
             --output {output.node_data} \
         """
 
-rule clades:
-    input:
-        tree = rules.refine.output.tree,
-        aa_muts = rules.translate.output.node_data,
-        nuc_muts = rules.ancestral.output.node_data,
-        clades = "defaults/clades_{subtype}.tsv",
-    output:
-        clade_data = "results/clades_{subtype}.json"
-    shell:
-        """
-        augur clades --tree {input.tree} \
-            --mutations {input.nuc_muts} {input.aa_muts} \
-            --clades {input.clades} \
-            --output-node-data {output.clade_data}
-        """
+# rule clades:
+#     input:
+#         tree = rules.refine.output.tree,
+#         aa_muts = rules.translate.output.node_data,
+#         nuc_muts = rules.ancestral.output.node_data,
+#         clades = "defaults/clades_{subtype}.tsv",
+#     output:
+#         clade_data = "results/{subtype}/{build}/clades.json"
+#     shell:
+#         """
+#         augur clades --tree {input.tree} \
+#             --mutations {input.nuc_muts} {input.aa_muts} \
+#             --clades {input.clades} \
+#             --output-node-data {output.clade_data}
+#         """
 
 rule traits:
     """
@@ -90,7 +90,7 @@ rule traits:
         tree = rules.refine.output.tree,
         metadata = rules.add_insertion.output.totalmetadata,
     output:
-        node_data = "results/traits_{subtype}.json",
+        node_data = "results/{subtype}/{build}/traits.json",
     params:
         columns = config["traits"]["columns"],
         sampling_bias_correction = config["traits"]["sampling_bias_correction"],

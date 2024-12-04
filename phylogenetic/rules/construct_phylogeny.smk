@@ -21,9 +21,9 @@ See Augur's usage docs for these commands for more details.
 rule tree:
     """Building tree"""
     input:
-        alignment = rules.align.output.alignment,
+        alignment = rules.align.output.alignment
     output:
-        tree = "results/tree_raw_{subtype}.nwk"
+        tree = "results/{subtype}/{build}/tree_raw.nwk"
     shell:
         """
         augur tree \
@@ -44,8 +44,8 @@ rule refine:
         alignment = rules.align.output.alignment,
         metadata = rules.filter.output.metadata
     output:
-        tree = "results/tree_{subtype}.nwk",
-        node_data = "results/branch_lengths_{subtype}.json"
+        tree = "results/{subtype}/{build}/tree.nwk",
+        node_data = "results/{subtype}/{build}/branch_lengths.json"
     params:
         coalescent = config["refine"]["coalescent"],
         date_inference = config["refine"]["date_inference"],

@@ -13,7 +13,7 @@ It produces output files as
 rule nextclade:
     input:
         sequences = "data/sequences.fasta",
-        ref = "defaults/reference.fasta",
+        ref = "defaults/reference_A.fasta",
         dataset = "../nextclade/dataset"
     output:
         nextclade = "data/nextclade.tsv"
@@ -41,21 +41,24 @@ rule extend_metadata:
                                        --nextclade {input.nextclade} \
                                        --output {output.metadata}
         """
-# rule subtypes:
-#     input:
-#         metadata = rules.extend_metadata.output.metadata,
-#         sequences = "data/sequences.fasta",
-#     output:
-#         metadata = "data/metadata_{subtype}",
-#         sequences = "data/sequences_{subtype}",
-#     params:
-#         subtype = lambda wc: wc.subtype
-#     shell:
-#         """
-#         augur filter \
-#             --metadata {input.metadata} \
-#             --sequences {input.sequences} \
-#             --query "subtypes == '{params.subtype}'" \
-#             --output-sequences {output.sequences} \
-#             --output-metadata {output.metadata}
-#         """
+
+rule newreference:
+    message:
+        """
+        Making new reference
+        """
+    input:
+        oldreference = "defaults/reference_{subtype}.gb"
+    output:
+        newreferencegb = "results/{subtype}/{build}/reference_{build}.gb",
+        newreferencefasta = "results/{subtype}/{build}/reference_{build}.fasta",
+    params:
+        build = lambda w: w.build,
+    shell:
+        """
+        python scripts/newreference.py \
+            --reference {input.oldreference} \
+            --output-genbank {output.newreferencegb} \
+            --output-fasta {output.newreferencefasta} \
+            --gene {params.build}
+        """

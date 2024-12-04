@@ -20,8 +20,12 @@ if __name__ == '__main__':
         alignedinsertionsdf = pd.read_csv(args.alignedinsertions, index_col=False)
         metadatadf = pd.read_csv(args.metadata, sep = '\t', index_col=False)
 
+        for column in alignedinsertionsdf.columns:
+            if alignedinsertionsdf[column].apply(lambda x: len(str(x)) >= 100).any():
+                column_with_insertion = column
+
         #create a new file with accession number and insertion metadata
-        d = {'strain': alignedinsertionsdf['strain'].values, 'boolean': alignedinsertionsdf['insertion: 181bp @ ref pos 6697'].str.len() > 30}
+        d = {'strain': alignedinsertionsdf['strain'].values, 'boolean': alignedinsertionsdf[column_with_insertion].str.len() > 30}
         df = pd.DataFrame(data=d)
         df.rename(columns={'strain': 'accession'}, inplace=True)
 

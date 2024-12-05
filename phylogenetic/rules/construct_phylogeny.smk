@@ -21,7 +21,7 @@ See Augur's usage docs for these commands for more details.
 rule tree:
     """Building tree"""
     input:
-        alignment = rules.align.output.alignment
+        alignment = rules.filter2.output.filtered_alignment
     output:
         tree = "results/{subtype}/{build}/tree_raw.nwk"
     shell:
@@ -41,8 +41,8 @@ rule refine:
     """
     input:
         tree = rules.tree.output.tree,
-        alignment = rules.align.output.alignment,
-        metadata = rules.filter.output.metadata
+        alignment = rules.filter2.output.filtered_alignment,
+        metadata = rules.filter2.output.filtered_metadata
     output:
         tree = "results/{subtype}/{build}/tree.nwk",
         node_data = "results/{subtype}/{build}/branch_lengths.json"
@@ -51,6 +51,7 @@ rule refine:
         date_inference = config["refine"]["date_inference"],
         clock_filter_iqd = config["refine"]["clock_filter_iqd"],
         strain_id = config.get("strain_id_field", "strain"),
+
     shell:
         """
         augur refine \
@@ -64,5 +65,5 @@ rule refine:
             --coalescent {params.coalescent} \
             --date-confidence \
             --date-inference {params.date_inference} \
-            --clock-filter-iqd {params.clock_filter_iqd}
+            --clock-filter-iqd {params.clock_filter_iqd} 
         """

@@ -34,7 +34,7 @@ rule ancestral:
     """Reconstructing ancestral sequences and mutations"""
     input:
         tree = rules.refine.output.tree,
-        alignment = rules.align.output.alignment,
+        alignment = rules.filter2.output.filtered_alignment,
     output:
         node_data = "results/{subtype}/{build}/nt_muts.json"
     params:
@@ -65,21 +65,21 @@ rule translate:
             --output {output.node_data} \
         """
 
-# rule clades:
-#     input:
-#         tree = rules.refine.output.tree,
-#         aa_muts = rules.translate.output.node_data,
-#         nuc_muts = rules.ancestral.output.node_data,
-#         clades = "defaults/clades_{subtype}.tsv",
-#     output:
-#         clade_data = "results/{subtype}/{build}/clades.json"
-#     shell:
-#         """
-#         augur clades --tree {input.tree} \
-#             --mutations {input.nuc_muts} {input.aa_muts} \
-#             --clades {input.clades} \
-#             --output-node-data {output.clade_data}
-#         """
+rule clades:
+    input:
+        tree = rules.refine.output.tree,
+        aa_muts = rules.translate.output.node_data,
+        nuc_muts = rules.ancestral.output.node_data,
+        clades = "defaults/clades_{subtype}_{build}.tsv",
+    output:
+        clade_data = "results/{subtype}/{build}/clades.json"
+    shell:
+        """
+        augur clades --tree {input.tree} \
+            --mutations {input.nuc_muts} {input.aa_muts} \
+            --clades {input.clades} \
+            --output-node-data {output.clade_data}
+        """
 
 rule traits:
     """

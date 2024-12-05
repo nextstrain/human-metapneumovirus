@@ -12,10 +12,6 @@ if __name__ == '__main__':
     parser.add_argument('--subtype')
     args = parser.parse_args()
 
-    ##################################################
-    #   Part 1
-    ##################################################
-
     if args.subtype == "A":
         alignedinsertionsdf = pd.read_csv(args.alignedinsertions, index_col=False)
         metadatadf = pd.read_csv(args.metadata, sep = '\t', index_col=False)

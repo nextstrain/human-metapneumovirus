@@ -27,6 +27,11 @@
       "type": "categorical"
     },
     {
+      "key": "clade",
+      "title": "Clade",
+      "type": "categorical"
+    },
+    {
       "key": "region",
       "title": "Region",
       "type": "categorical"

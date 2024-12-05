@@ -28,7 +28,7 @@ rule colors:
     input:
         color_schemes = "defaults/color_schemes.tsv",
         color_orderings = "defaults/color_orderings.tsv",
-        metadata = rules.filter.output.metadata,
+        metadata = rules.filter2.output.filtered_metadata,
     output:
         colors = "results/{subtype}/{build}/colors.tsv"
     shell:
@@ -44,13 +44,13 @@ rule export:
     """Exporting data files for for auspice"""
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.filter.output.metadata,
+        metadata = rules.filter2.output.filtered_metadata,
         branch_lengths = rules.refine.output.node_data,
         traits = rules.traits.output.node_data,
         nt_muts = rules.ancestral.output.node_data,
         aa_muts = rules.translate.output.node_data,
         colors = rules.colors.output.colors,
-        #clades = rules.clades.output.clade_data,
+        clades = rules.clades.output.clade_data,
         auspice_config = "defaults/auspice_config.json",
     output:
         auspice_json = "results/{subtype}/{build}/raw_hmpv.json"
@@ -62,7 +62,7 @@ rule export:
             --tree {input.tree} \
             --metadata {input.metadata} \
             --metadata-id-columns {params.strain_id} \
-            --node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts} \
+            --node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts} {input.clades}\
             --colors {input.colors} \
             --auspice-config {input.auspice_config} \
             --include-root-sequence-inline \
@@ -72,7 +72,7 @@ rule export:
 rule final_strain_name:
     input:
         auspice_json=rules.export.output.auspice_json,
-        metadata=rules.filter.output.metadata,
+        metadata=rules.filter2.output.filtered_metadata,
     output:
         auspice_json="auspice/hmpv_{subtype}_{build}.json"
     params:

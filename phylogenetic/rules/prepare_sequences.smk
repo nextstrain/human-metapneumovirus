@@ -43,7 +43,6 @@ rule filter:
         subtype = lambda wc: wc.subtype,
         build = lambda wc: wc.build,
         min_coverage = lambda w: f'{config["filter"]["min_coverage"].get(w.build, 10000)}',
-        min_length = lambda w: config["filter"]["min_length"].get(w.build, 10000),
         subsample_max_sequences = lambda w: config["filter"]["subsample_max_sequences"].get(w.build, 10000),
     shell:
         """
@@ -51,14 +50,12 @@ rule filter:
             --sequences {input.sequences} \
             --metadata {input.metadata} \
             --metadata-id-columns {params.strain_id} \
-            --query "subtypes == '{params.subtype}'" \
-            --query "{params.build}_coverage > {params.min_coverage}"\
+            --query "subtypes == '{params.subtype}' & {params.build}_coverage > {params.min_coverage}"\
             --output-sequences {output.sequences} \
             --output-metadata {output.metadata} \
             --group-by {params.group_by} \
             --subsample-max-sequences {params.subsample_max_sequences} \
-            --min-date {params.min_date} \
-            --min-length {params.min_length}
+            --min-date {params.min_date} 
         """
 
 rule align:
@@ -81,12 +78,36 @@ rule align:
             --nthreads {threads}
         """
 
+rule filter2:
+    """
+    Excluding sequences with too many Ns
+    """
+    input: 
+        sequences = rules.align.output.alignment,
+        metadata = rules.filter.output.metadata,
+    output: 
+        filtered_alignment = "results/{subtype}/{build}/filtered_alignment.fasta",
+        filtered_metadata = "results/{subtype}/{build}/filtered_metadata.tsv",
+    params:
+        min_length = lambda w: config["filter"]["min_length"].get(w.build, 10000),
+        strain_id = config.get("strain_id_field", "strain"),
+    shell:
+        """
+        augur filter \
+            --metadata-id-columns {params.strain_id} \
+            --sequences {input.sequences} \
+            --metadata {input.metadata} \
+            --min-length {params.min_length} \
+            --output-sequences {output.filtered_alignment} \
+            --output-metadata {output.filtered_metadata} 
+        """
+
 rule add_insertion:
     """
     Add insertion data to metadata
     """
     input:
-        metadata = rules.filter.output.metadata,
+        metadata = rules.filter2.output.filtered_metadata,
         insertions = rules.align.output.insertions
     output: 
         totalmetadata = 'results/{subtype}/{build}/totalmetadata.tsv'

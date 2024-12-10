@@ -45,5 +45,5 @@ ancestral:
   inference: "joint"
 
 traits:
-  columns: "region country insertion6738"
+  columns: "region country insertion"
   sampling_bias_correction: 3

@@ -112,53 +112,14 @@ rule add_insertion:
     output: 
         totalmetadata = 'results/{subtype}/{build}/totalmetadata.tsv'
     params:
-        subtype = lambda wc: wc.subtype
+        subtype = lambda wc: wc.subtype,
+        build = lambda wc: wc.build
     shell:
         """
         python scripts/insertion-metadata.py \
-            --alignedinsertions {input.insertions} \
+            --aligned_insertions {input.insertions} \
             --metadata {input.metadata}\
             --subtype {params.subtype} \
+            --build {params.build} \
             --metadata_insertion {output.totalmetadata}
         """
-
-# rule cut:
-#     """
-#     Cut out G and F gene for alignment refinement
-#     """
-#     input:
-#         oldalignment = rules.align.output.alignment,
-#         reference = "defaults/reference_{subtype}.gb"
-#     output:
-#         slicedalignment = "results/{subtype}/{build}/{build}_slicedalignment.fasta"
-#     params:
-#         build = lambda w: w.build
-#     shell:
-#         """
-#         python scripts/cut.py \
-#             --oldalignment {input.oldalignment} \
-#             --slicedalignment {output.slicedalignment} \
-#             --reference {input.reference} \
-#             --gene {params.build}
-#         """
-
-# rule realign:
-#     input:
-#         slicedalignment = rules.cut.output.slicedalignment,
-#         reference = rules.newreference.output.newreferencefasta
-#     output:
-#         realigned = "results/{subtype}/{build}/{build}_aligned.fasta"
-#     threads: 8
-#     shell:
-#         """
-#         augur align --nthreads {threads} \
-#             --sequences {input.slicedalignment} \
-#             --reference-sequence {input.reference} \
-#             --output {output.realigned}
-#         """
-
-# def get_alignment(wc):
-#     if wc.build == "genome":
-#         return rules.align.output.alignment
-#     else:
-#         return f"results/{wc.subtype}/{wc.build}/{wc.build}_aligned.fasta"

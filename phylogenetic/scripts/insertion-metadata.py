@@ -1,36 +1,55 @@
 import pandas as pd
 import csv
+import re
+
+def add_insertions(subtype, build, metadata, alignedinsertions, metadata_insertion):
+
+    alignedinsertionsdf = pd.read_csv(alignedinsertions, index_col="strain")
+    metadatadf = pd.read_csv(metadata, sep = '\t', index_col="accession")
+
+    if subtype == "A" and build != "F":
+
+        if build =="genome":
+            min_position = 6247
+            max_position = 6956
+
+        if build == "G":
+            min_position = 1
+            max_position = 710 
+
+        #select columns in gene G with insertions
+        column_with_insertion = []
+        for column in alignedinsertionsdf.columns:
+            match = re.match(r"^insertion.*pos (\d+)", column)
+            if match is None:
+                continue
+            if min_position <= int(match.group(1)) <= max_position:
+                column_with_insertion.append(column)
+
+        #select strains in gene G with insertions longer than 30 and add column with insertion data to metadata file
+        index_with_insertion = []
+        for index, row in alignedinsertionsdf.iterrows():
+            has_insertion = any(len(str(row[col])) > 30 for col in column_with_insertion)
+            if has_insertion:
+                index_with_insertion.append(index)
+            print(index_with_insertion)
+        metadatadf['insertion'] = metadatadf.index.isin(index_with_insertion)
+        metadatadf.to_csv(metadata_insertion, sep='\t', index= "accession")
+
+    elif subtype == "B" or build == "F":
+        metadatadf.to_csv(metadata_insertion, sep='\t', index= "accession")
 
 if __name__ == '__main__':
     import argparse
 
     parser = parser = argparse.ArgumentParser(description='parse metadata',
                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--alignedinsertions', help="input aligned insertions file")           
+    parser.add_argument('--aligned_insertions', help="input aligned insertions file")           
     parser.add_argument('--metadata', help="input metadata file")
-    parser.add_argument('--metadata_insertion', help="final output metadata with >30 bp insertion in G gene")
+    parser.add_argument('--metadata_insertion', help="final output metadata with insertion in G gene")
     parser.add_argument('--subtype')
+    parser.add_argument('--build')
     args = parser.parse_args()
 
-    if args.subtype == "A":
-        alignedinsertionsdf = pd.read_csv(args.alignedinsertions, index_col=False)
-        metadatadf = pd.read_csv(args.metadata, sep = '\t', index_col=False)
+    add_insertions(args.subtype, args.build, args.metadata, args.aligned_insertions, args.metadata_insertion)
 
-        for column in alignedinsertionsdf.columns:
-            if alignedinsertionsdf[column].apply(lambda x: len(str(x)) >= 100).any():
-                column_with_insertion = column
-
-        #create a new file with accession number and insertion metadata
-        d = {'strain': alignedinsertionsdf['strain'].values, 'boolean': alignedinsertionsdf[column_with_insertion].str.len() > 30}
-        df = pd.DataFrame(data=d)
-        df.rename(columns={'strain': 'accession'}, inplace=True)
-
-        #merge new file with insertion data and metadata file
-        totalmetadata = pd.merge(metadatadf, df, on='accession', how='left')
-        totalmetadata['boolean'] = totalmetadata['boolean'].fillna(False)
-        totalmetadata.rename(columns={'boolean': 'insertion6738'}, inplace=True)
-        totalmetadata.to_csv(args.metadata_insertion, sep='\t', index= False)
-
-    elif args.subtype == "B":
-        totalmetadata = pd.read_csv(args.metadata, sep = '\t', index_col=False)
-        totalmetadata.to_csv(args.metadata_insertion, sep = '\t', index=False)

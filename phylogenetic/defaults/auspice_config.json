@@ -37,7 +37,7 @@
       "type": "categorical"
     },
     {
-      "key": "insertion6738",
+      "key": "insertion",
       "title": ">30bp insertion in G gene",
       "type": "boolean"
     }

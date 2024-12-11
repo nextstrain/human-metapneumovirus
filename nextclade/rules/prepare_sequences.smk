@@ -8,7 +8,7 @@ REFERENCE_PATH = "resources/reference.fasta"
 README_PATH = "resources/README.md"
 CHANGELOG_PATH = "resources/CHANGELOG.md"
 ROOTING = "mid_point"  # alternative root using outgroup, e.g. the reference NC_039199.1
-MIN_LENGTH = 500 # Minimal length of sequences for example dataset.
+MIN_LENGTH = 1000 # Minimal length of sequences for example dataset.
 
 
 # #rule add_reference_to_include:

@@ -19,7 +19,7 @@
     "cli": "3.0.0-alpha.0",
     "web": "3.0.0-alpha.0"
   },
-  "defaultCds": "G",
+  "defaultCds": "F",
   "files": {
     "examples": "sequences.fasta",
     "genomeAnnotation": "genome_annotation.gff3",

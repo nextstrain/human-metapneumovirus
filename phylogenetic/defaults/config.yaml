@@ -47,3 +47,6 @@ ancestral:
 traits:
   columns: "region country insertion"
   sampling_bias_correction: 3
+
+# deploy
+deploy_url: "s3://nextstrain-staging"

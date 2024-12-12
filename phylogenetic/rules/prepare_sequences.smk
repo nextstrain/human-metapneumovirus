@@ -21,6 +21,27 @@ This part of the workflow usually includes the following steps:
 See Augur's usage docs for these commands for more details.
 """
 
+rule newreference:
+    message:
+        """
+        Making new reference
+        """
+    input:
+        oldreference = "defaults/reference_{subtype}.gb"
+    output:
+        newreferencegb = "results/{subtype}/{build}/reference_{build}.gb",
+        newreferencefasta = "results/{subtype}/{build}/reference_{build}.fasta",
+    params:
+        build = lambda w: w.build,
+    shell:
+        """
+        python scripts/newreference.py \
+            --reference {input.oldreference} \
+            --output-genbank {output.newreferencegb} \
+            --output-fasta {output.newreferencefasta} \
+            --gene {params.build}
+        """
+
 rule filter:
     """
     Filtering to
@@ -31,7 +52,7 @@ rule filter:
     """
     input:
         sequences = "data/sequences.fasta",
-        metadata = rules.extend_metadata.output.metadata,
+        metadata = "data/metadata.tsv"
     output:
         sequences = "results/{subtype}/{build}/filtered.fasta",
         metadata = "results/{subtype}/{build}/metadata.tsv",

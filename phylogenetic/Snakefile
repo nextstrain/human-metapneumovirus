@@ -17,7 +17,7 @@ rule all:
             subtype = config.get("subtypes"),
             build = config.get("build", ['genome'])),
 
-include: "rules/sort.smk"
+include: "rules/download.smk"
 
 include: "rules/prepare_sequences.smk"
 
@@ -26,6 +26,9 @@ include: "rules/construct_phylogeny.smk"
 include: "rules/annotate_phylogeny.smk"
 
 include: "rules/export.smk"
+
+if "deploy_url" in config:
+    include: "rules/nextstrain_automation.smk"
 
 # Allow users to import custom rules provided via the config.
 # This allows users to run custom rules that can extend or override the workflow.

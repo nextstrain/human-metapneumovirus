@@ -1,0 +1,47 @@
+name: Rebuild hMPV analysis
+
+on:
+  schedule:
+    # Note times are in UTC, which is 1 or 2 hours behind CET depending on daylight savings.
+    #
+    # Note the actual runs might be late.
+    # Numerous people were confused, about that, including me:
+    #  - https://github.community/t/scheduled-action-running-consistently-late/138025/11
+    #  - https://github.com/github/docs/issues/3059
+    #
+    # Note, '*' is a special character in YAML, so you have to quote this string.
+    #
+    # Docs:
+    #  - https://docs.github.com/en/actions/learn-github-actions/events-that-trigger-workflows#schedule
+    #
+    # Tool that deciphers this particular format of crontab string:
+    #  - https://crontab.guru/
+    #
+    # Runs at 6:14pm UTC on Tuesdays.
+    - cron:  '14 18 * * 2'
+
+  repository_dispatch:
+    types:
+      - rebuild
+
+  workflow_dispatch:
+
+jobs:
+  rebuild_rsv:
+    permissions:
+      id-token: write
+    uses: nextstrain/.github/.github/workflows/pathogen-repo-build.yaml@master
+    secrets: inherit
+    with:
+      runtime: aws-batch
+      run: |
+        nextstrain build \
+          --aws-batch \
+          --detach \
+          --no-download \
+          --cpus 16 \
+          --memory 64gib \
+          phylogenetic \
+          deploy \
+            --configfiles config/configfile.yaml config/nextstrain_automation.yaml \
+            --printshellcmds

@@ -14,7 +14,7 @@ upload:
     # Remote file names for the files to upload, must be in the same order as local files above
     remote_file_names: [
       'ncbi.ndjson.xz',
-      'extended_metadata.tsv.gz',
+      'metadata.tsv.gz',
       'sequences.fasta.xz'
     ]
     cloudfront_domain: 'data.nextstrain.org'

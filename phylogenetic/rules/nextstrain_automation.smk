@@ -14,7 +14,7 @@ rule deploy:
     input:
         *rules.all.input,
     output:
-        touch(build_dir + f"/deploy.done"),
+        touch("results/deploy.done"),
     params:
         deploy_url=DEPLOY_URL,
     shell:

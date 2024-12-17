@@ -7,7 +7,7 @@ def add_insertions(subtype, build, metadata, alignedinsertions, metadata_inserti
     alignedinsertionsdf = pd.read_csv(alignedinsertions, index_col="strain")
     metadatadf = pd.read_csv(metadata, sep = '\t', index_col="accession")
 
-    if subtype == "A" and build != "F":
+    if subtype == "a" and build != "F":
 
         if build =="genome":
             min_position = 6247
@@ -15,7 +15,7 @@ def add_insertions(subtype, build, metadata, alignedinsertions, metadata_inserti
 
         if build == "G":
             min_position = 1
-            max_position = 710 
+            max_position = 710
 
         #select columns in gene G with insertions
         column_with_insertion = []
@@ -36,7 +36,7 @@ def add_insertions(subtype, build, metadata, alignedinsertions, metadata_inserti
         metadatadf['insertion'] = metadatadf.index.isin(index_with_insertion)
         metadatadf.to_csv(metadata_insertion, sep='\t', index= "accession")
 
-    elif subtype == "B" or build == "F":
+    elif subtype == "b" or build == "F":
         metadatadf.to_csv(metadata_insertion, sep='\t', index= "accession")
 
 if __name__ == '__main__':
@@ -44,9 +44,9 @@ if __name__ == '__main__':
 
     parser = parser = argparse.ArgumentParser(description='parse metadata',
                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--aligned_insertions', help="input aligned insertions file")           
+    parser.add_argument('--aligned-insertions', help="input aligned insertions file")
     parser.add_argument('--metadata', help="input metadata file")
-    parser.add_argument('--metadata_insertion', help="final output metadata with insertion in G gene")
+    parser.add_argument('--metadata-insertion', help="final output metadata with insertion in G gene")
     parser.add_argument('--subtype')
     parser.add_argument('--build')
     args = parser.parse_args()

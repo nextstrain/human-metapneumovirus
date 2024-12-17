@@ -11,7 +11,7 @@ build: ["genome", "G", "F"]
 strain_id_field: "accession"
 display_strain_field: "strain"
 
-subtypes: ['A', 'B']
+subtypes: ['a', 'b']
 
 filter:
   group_by: "country year month"

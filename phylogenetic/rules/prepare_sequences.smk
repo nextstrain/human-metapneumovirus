@@ -48,7 +48,7 @@ rule filter:
       - {params.sequences_per_group} sequence(s) per {params.group_by!s}
       - from {params.min_date} onwards
       - excluding strains in {input.exclude}
-      - minimum genome length of {params.min_length} 
+      - minimum genome length of {params.min_length}
     """
     input:
         sequences = "data/sequences.fasta",
@@ -61,7 +61,7 @@ rule filter:
         sequences_per_group = config["filter"]["sequences_per_group"],
         min_date = config["filter"]["min_date"],
         strain_id = config.get("strain_id_field", "strain"),
-        subtype = lambda wc: wc.subtype,
+        subtype = lambda wc: wc.subtype.upper(),
         build = lambda wc: wc.build,
         min_coverage = lambda w: f'{config["filter"]["min_coverage"].get(w.build, 10000)}',
         subsample_max_sequences = lambda w: config["filter"]["subsample_max_sequences"].get(w.build, 10000),
@@ -76,7 +76,7 @@ rule filter:
             --output-metadata {output.metadata} \
             --group-by {params.group_by} \
             --subsample-max-sequences {params.subsample_max_sequences} \
-            --min-date {params.min_date} 
+            --min-date {params.min_date}
         """
 
 rule align:
@@ -103,10 +103,10 @@ rule filter2:
     """
     Excluding sequences with too many Ns
     """
-    input: 
+    input:
         sequences = rules.align.output.alignment,
         metadata = rules.filter.output.metadata,
-    output: 
+    output:
         filtered_alignment = "results/{subtype}/{build}/filtered_alignment.fasta",
         filtered_metadata = "results/{subtype}/{build}/filtered_metadata.tsv",
     params:
@@ -120,7 +120,7 @@ rule filter2:
             --metadata {input.metadata} \
             --min-length {params.min_length} \
             --output-sequences {output.filtered_alignment} \
-            --output-metadata {output.filtered_metadata} 
+            --output-metadata {output.filtered_metadata}
         """
 
 rule add_insertion:
@@ -130,7 +130,7 @@ rule add_insertion:
     input:
         metadata = rules.filter2.output.filtered_metadata,
         insertions = rules.align.output.insertions
-    output: 
+    output:
         totalmetadata = 'results/{subtype}/{build}/totalmetadata.tsv'
     params:
         subtype = lambda wc: wc.subtype,
@@ -138,9 +138,9 @@ rule add_insertion:
     shell:
         """
         python scripts/insertion-metadata.py \
-            --aligned_insertions {input.insertions} \
+            --aligned-insertions {input.insertions} \
             --metadata {input.metadata}\
             --subtype {params.subtype} \
             --build {params.build} \
-            --metadata_insertion {output.totalmetadata}
+            --metadata-insertion {output.totalmetadata}
         """

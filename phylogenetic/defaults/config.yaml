@@ -17,7 +17,7 @@ filter:
   group_by: "country year month"
   sequences_per_group: 40
   min_date: 1800
-  min_length: 
+  min_length:
     genome: 10000
     G: 500
     F: 1200
@@ -26,7 +26,7 @@ filter:
     genome: 0.8
     G: 0.8
     F: 0.8
-  
+
   subsample_max_sequences:
     genome: 1000
     G: 1000
@@ -49,4 +49,4 @@ traits:
   sampling_bias_correction: 3
 
 # deploy
-deploy_url: "s3://nextstrain-staging"
+deploy_url: "s3://nextstrain-data"

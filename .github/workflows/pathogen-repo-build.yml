@@ -56,8 +56,8 @@ jobs:
       run: |
         nextstrain build \
           ingest \
-            upload_all \
-            --configfile build-configs/nextstrain-automation/config.yaml
+            all \
+            --configfile config/config.yaml config/optional.yaml
       # Specifying artifact name to differentiate ingest build outputs from
       # the phylogenetic build outputs
       artifact-name: ingest-build-output
